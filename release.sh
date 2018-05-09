@@ -10,16 +10,29 @@ yarn
 yarn build
 popd
 
-echo "Clean up"
-if [ -f ./efcsydney-roster.tar.gz ]; then
-  rm -rf efcsydney-roster.tar.gz
-fi
+test() {
+  export NODE_ENV=test
+  yarn db-create
+  yarn db-migrate
+  yarn test
+  yarn test:frontend
+  echo "Stop"
+}
 
-rm -rf client/node_modules
-find log/* ! -name '.gitignore' -exec rm -rf {} +
+build() {
+  echo "Clean up"
+  if [ -f ./efcsydney-roster.tar.gz ]; then
+    rm -rf efcsydney-roster.tar.gz
+  fi
 
-echo "Tar"
-pushd ../
-tar -czf efcsydney-roster.tar.gz efcsydney-roster
-mv efcsydney-roster.tar.gz efcsydney-roster/
-popd
+  rm -rf client/node_modules
+  find log/* ! -name '.gitignore' -exec rm -rf {} +
+
+  echo "Tar"
+  pushd ../
+  tar -czf efcsydney-roster.tar.gz efcsydney-roster
+  mv efcsydney-roster.tar.gz efcsydney-roster/
+  popd
+}
+
+$1

@@ -1,7 +1,14 @@
 #!/bin/bash -x
 
 release() {
-  docker-compose run  --entrypoint='/bin/bash -x /opt/efcsydney-roster/release.sh' efc-dev
+  docker-compose run  --entrypoint='/bin/bash -x /opt/efcsydney-roster/release.sh build' efc-dev
+  docker-compose rm -y efc-dev
+}
+
+test() {
+  docker-compose run  --entrypoint='/bin/bash -x /opt/efcsydney-roster/release.sh test' efc-dev
+  docker-compose stop
+  docker-compose rm -f
 }
 
 build(){
