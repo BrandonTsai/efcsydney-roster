@@ -1,0 +1,116 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Parameters":{
+    "KeyName":{
+      "Type":"AWS::EC2::KeyPair::KeyName",
+      "Description":"Name of an existing EC2 KeyPair to enable SSH access to the ECS instances."
+    },
+    "VpcId":{
+      "Type":"AWS::EC2::VPC::Id",
+      "Description":"Select a VPC that allows instances to access the Internet."
+    },
+    "SubnetId":{
+      "Type":"List<AWS::EC2::Subnet::Id>",
+      "Description":"Select at two subnets in your selected VPC."
+    },
+    "DesiredCapacity":{
+      "Type":"Number",
+      "Default":"1",
+      "Description":"Number of instances to launch in your ECS cluster."
+    },
+    "MaxSize":{
+      "Type":"Number",
+      "Default":"1",
+      "Description":"Maximum number of instances that can be launched in your ECS cluster."
+    },
+    "InstanceType":{
+      "Description":"EC2 instance type",
+      "Type":"String",
+      "Default":"t2.micro",
+      "AllowedValues":[
+        "t2.micro"
+      ],
+      "ConstraintDescription":"Please choose a valid instance type."
+    },
+    "EcsSecurityGroupID":{
+      "Type":"AWS::EC2::SecurityGroup::Id",
+      "Description":"EC2 instance type"
+    }
+  },
+  "Mappings":{
+    "AWSRegionToAMI":{
+      "us-east-1":{
+        "AMIID":"ami-eca289fb"
+      },
+      "us-east-2":{
+        "AMIID":"ami-446f3521"
+      },
+      "us-west-1":{
+        "AMIID":"ami-9fadf8ff"
+      },
+      "us-west-2":{
+        "AMIID":"ami-7abc111a"
+      },
+      "eu-west-1":{
+        "AMIID":"ami-a1491ad2"
+      },
+      "eu-central-1":{
+        "AMIID":"ami-54f5303b"
+      },
+      "ap-northeast-1":{
+        "AMIID":"ami-9cd57ffd"
+      },
+      "ap-southeast-1":{
+        "AMIID":"ami-a900a3ca"
+      },
+      "ap-southeast-2":{
+        "AMIID":"ami-5781be34"
+      }
+    }
+  },
+  "Resources":{
+    "ECSServiceRole":{
+      "Type":"AWS::IAM::Role",
+      "Properties":{
+        "AssumeRolePolicyDocument":{
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":{
+                "Service":[
+                  "ecs.amazonaws.com"
+                ]
+              },
+              "Action":[
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path":"/",
+        "Policies":[
+          {
+            "PolicyName":"ecs-service",
+            "PolicyDocument":{
+              "Statement":[
+                {
+                  "Effect":"Allow",
+                  "Action":[
+                    "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                    "elasticloadbalancing:DeregisterTargets",
+                    "elasticloadbalancing:Describe*",
+                    "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                    "elasticloadbalancing:RegisterTargets",
+                    "ec2:Describe*",
+                    "ec2:AuthorizeSecurityGroupIngress"
+                  ],
+                  "Resource":"*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
